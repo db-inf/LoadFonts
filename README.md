@@ -5,7 +5,7 @@ I run a last Windows setup in a VirtualBox virtual machine on my linux host. I w
 
 Windows prefers the font files to be in the Windows\Fonts folder, which is not where I want them.
 
-Font management software like Bitstream Font Navigator let you put the files where you want them, and places a reference to them under the registry key `HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts`. But Windows tries to load these fonts before my network shares or VirtualBox shared folders are ready, with as result that they are not loaded at all.
+Font management software like Bitstream Font Navigator lets you put the files where you want them, and 'installs' fonts by placing a reference to them under the registry key `HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts`. But Windows tries to load these fonts before it can access my network shares or VirtualBox shared folders, with as result that they are not loaded at all.
 
 That made me write this simple program, that uses the Windows function `AddFontResource(filename)` to make the fonts available to every windows application. My setup has a link to **LoadFonts.exe** in my `Start Menu\Programs\Startup` folder (or whatever it is called in English, I am not sure about that). Until now, my shared network drive that holds the fonts I want has always been ready by the time LoadFonts.exe is run from this link.
 
@@ -23,4 +23,6 @@ LoadFonts.exe [ fontfile | [-R] fontdirectory | -L fonts.lst ]...
 
 For compilation I used a command line Microsoft C compiler extracted from the Microsoft Visual Studio 2005 Express edition, enriched with some Microsoft Windows SDK. I know, stone age. I do not remember how I extracted it, I am just carrying it around since then. And it still works. But there is no fancy code in LoadFonts.c, so getting it compiled in newer setups should not be too difficult.
 
-Have fun with it.
+I have no need for a counterpart `UnloadFonts` for `LoadFonts`. Making one however seems trivial. You would just have to replace the calls to `AddFontResource(filename)` by `RemoveFontResource(filename)`, and change the wording of some text strings that serve as user interface.
+
+Be happy.
