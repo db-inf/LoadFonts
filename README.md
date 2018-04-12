@@ -24,6 +24,6 @@ LoadFonts is tested in Windows XP 32 bit, Windows 7 32 bit and Windows 10 64 bit
 
 I have no need for a counterpart `UnloadFonts` to `LoadFonts`. Making one seems trivial however. You would just have to replace the calls to `AddFontResource(filename)` by `RemoveFontResource(filename)`, reinterpret the return value as boolean instead of number of fonts loaded, and change the wording of some text strings that serve as user interface.
 
-For compilation I used the command line Microsoft C compiler I once pulled out of the Express edition of Microsoft Visual Studio 2005, enriched with a stone age version of the Microsoft Windows SDK. I do not remember how I made that combol I am carrying it around since then, and it still works. But there is no fancy code in LoadFonts.c, so getting it compiled in newer setups should not be too difficult.
+For compilation I used the command line Microsoft C compiler I once pulled out of the Express edition of Microsoft Visual Studio 2005, enriched with a stone age version of the Microsoft Windows SDK. I do not remember how I made that combo. I am carrying it around since then, and it still works. But there is no fancy code in LoadFonts.c, so getting it compiled in newer setups should not be too difficult.
 
 Be happy.
