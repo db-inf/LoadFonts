@@ -3,7 +3,7 @@
 // fontfile : tested with *.ttf, *.ttc (not all work), .otf, *.pfb (with associated .pfm and .mmm, not all work)
 
 /* To compile with Microsoft Visual C 2005 (Command line) :
- * X:\...\> g:\PROGRAMS\MSVS2005\SETENVC.BAT
+ * X:\...\> g:\PROGRAMS\MSVC2005\SETVCENV.BAT
  * X:\...\msvc\LaadFonts> cl /MT LoadFonts.c gdi32.lib user32.lib
  * 		/MT link with LIBCMT.LIB (no need to install SDK DLLs)
  *
@@ -63,7 +63,7 @@ void loadFont(int i, char * s)
 		char *sPSFont = malloc(1 + sizeof(*sPSFont) * (3 * lstrlen(s) + 2));//up to 3 copies and 2 x "|"
 		if (sPSFont == NULL)
 		{
-			printf("ERROR out-of-memory handling %s for arg[i].\r\n", s, i);
+			printf("ERROR out-of-memory handling %s for arg[%i].\r\n", s, i);
 			return;
 		}
 		//NOTE : the order for mult-file fonts is not documented but important: pfm|pfb or pfm|pfb|mmm.
@@ -109,7 +109,7 @@ void loadDirectory(int i, char *s)
 		//printf("type %s\r\n", sType);
 		if (sPattern == 0)
 		{
-			printf("ERROR out-of-memory handling type %s in %s for arg[i].\r\n", sType, s, i);
+			printf("ERROR out-of-memory handling type %s in %s for arg[%i].\r\n", sType, s, i);
 			continue;
 		}
 		lstrcpy(sPattern, s);
@@ -152,7 +152,7 @@ void loadSubdirectories(int i, char *s)
 	char *sPattern = malloc(1 + sizeof(*sPattern) * (lstrlen(s) + 1 + lstrlen(sWildcard)));
 	//printf("Recursion to path %s\r\n", s);
 	if (sPattern == 0)
-		printf("ERROR out-of-memory handling recursion in %s for arg[i]\r\n", s, i);
+		printf("ERROR out-of-memory handling recursion in %s for arg[%i]\r\n", s, i);
 	else
 	{
 		lstrcpy(sPattern, s);
@@ -231,7 +231,7 @@ void readFontList(int i, char *s)
 			printf("ERROR Cannot handle gigabyte font list file arg[%i] = %s\r\n", i, s);
 		else
 		{
-			pcFontList = malloc(dwFileSize + 1);
+			pcFontList = malloc(dwFileSize + 1);//1 extra for terminating with ascii-z
 			if (!pcFontList)
 			{
 				printf("ERROR out-of-memory reading font list file arg[%i] = %s\r\n", i, s);
@@ -268,7 +268,7 @@ void readFontList(int i, char *s)
 		CloseHandle(hFile);
 	}
 	else
-		printf("ERROR (%d) opening font list file arg[i] = %s\r\n", GetLastError(), i, s);
+		printf("ERROR (%d) opening font list file arg[%i] = %s\r\n", GetLastError(), i, s);
 }
 
 int main(int argc, char* argv[])
@@ -279,13 +279,13 @@ int main(int argc, char* argv[])
 		printf(
 		"\r\n"
 		"Usage : %s [ fontfile | [-R] fontdirectory | -L fonts.lst ]...\r\n\r\n"
-		"    Font file can be a .ttf, .ttc, .fon, .fnt, .fot, .otf or .pfb type.\r\n"
+		"  Font file can be a .ttf, .ttc, .fon, .fnt, .fot, .otf or .pfb type.\r\n"
 		"    For a Type 1 .pfb (font bits), also the .pfm (font metrics) and eventual\r\n"
 		"    .mmm (multiple master metrics) are loaded. Loading multiple master\r\n"
 		"    instances however is not supported.\r\n"
-		"    -R : load subdirectories of font directory recursively.\r\n"
-		"    Font directory : load all font files in it with the above extensions.\r\n"
-		"    Font list with fontdirectories (no recursion) and fontfiles, line by line.\r\n"
+		"  -R : load subdirectories of font directory recursively.\r\n"
+		"  Font directory : load all font files in it with the above extensions.\r\n"
+		"  Font list with fontdirectories (no recursion) and fontfiles, line by line.\r\n"
 		, argv[0]);
 		return;
 	}
