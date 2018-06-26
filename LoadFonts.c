@@ -124,7 +124,7 @@ void loadDirectory(int i, char *s)
 			if (iError == ERROR_FILE_NOT_FOUND)
 			{} //will happen
 			else
-				printf("ERROR FindFirstFile failed (%d) for type %s in %s for arg[%i].\r\n", iError, sType, s, i);
+				printf("ERROR (%d) FindFirstFile failed for type %s in %s for arg[%i].\r\n", iError, sType, s, i);
 			continue;
 		} 
 		else 
@@ -166,7 +166,7 @@ void loadSubdirectories(int i, char *s)
 			if (iError == ERROR_FILE_NOT_FOUND)
 			{} //will happen
 			else
-				printf("ERROR FindFirstFile failed (%d) for recursion in %s for arg[%i].\r\n", iError, s, i);
+				printf("ERROR (%d) FindFirstFile failed for recursion in %s for arg[%i].\r\n", iError, s, i);
 		}
 		else 
 		{
@@ -183,7 +183,7 @@ void loadSubdirectories(int i, char *s)
 				dwAttrib = GetFileAttributes(sPath);
 				if (dwAttrib == (DWORD)-1)
 				{
-					printf("ERROR can not get attributes (%d) for %s in %s for arg[%i].\r\n", GetLastError(), sPath, s, i);
+					printf("ERROR (%d) can not get attributes for %s in %s for arg[%i].\r\n", GetLastError(), sPath, s, i);
 					continue;
 				}
 				else if (dwAttrib & FILE_ATTRIBUTE_DIRECTORY)
@@ -202,8 +202,8 @@ void loadPath(int i, char *s, int recur)
 {
 	DWORD dwAttrib = GetFileAttributes(s);
 	if (dwAttrib == (DWORD)-1)
-	{
-		printf("ERROR can not get attributes (%d) of %s for arg[%i].\r\n", GetLastError(), s, i);
+	{//TODO s might contain wildcards; use FindFirstFile() etc. to try to expand them
+		printf("ERROR (%d) can not get attributes of %s for arg[%i].\r\n", GetLastError(), s, i);
 		return;
 	}
 	else if (dwAttrib & FILE_ATTRIBUTE_DIRECTORY)
@@ -224,11 +224,15 @@ void readFontList(int i, char *s)
 	HANDLE hFile = CreateFile(s, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile)
 	{
-		DWORD dwFileSize = GetFileSize(hFile, NULL);//not interested in files so large that we need filesize-high
+		DWORD dwFileSizeHigh = 0;
+		DWORD dwFileSize = GetFileSize(hFile, &dwFileSizeHigh);//not interested in files so large that we need filesize-high
 		DWORD dwRead, dw;
 		char *pcPath;
-		if (dwFileSize == (DWORD)-1)
-			printf("ERROR Cannot handle gigabyte font list file arg[%i] = %s\r\n", i, s);
+		int iError;
+		if (dwFileSize == INVALID_FILE_SIZE && (iError = GetLastError()) != NO_ERROR)//could be genuine size (DWORD)-1 
+			printf("ERROR (%d) Cannot get size of font list file arg[%i] = %s\r\n", iError, i, s);
+		else if (dwFileSizeHigh != 0 || dwFileSize == (DWORD)-1)
+			printf("ERROR Will not handle multi-gigabyte font list file arg[%i] = %s\r\n", i, s);
 		else
 		{
 			pcFontList = malloc(dwFileSize + 1);//1 extra for terminating with ascii-z
@@ -240,7 +244,7 @@ void readFontList(int i, char *s)
 			}
 			if (!ReadFile(hFile, pcFontList, dwFileSize, &dwRead, NULL) || dwRead != dwFileSize)
 			{
-				printf("ERROR could not read complete font list file arg[%i] = %s\r\n", i, s);
+				printf("ERROR (%d) could not read complete font list file arg[%i] = %s\r\n", GetLastError(), i, s);
 				free(pcFontList);
 				CloseHandle(hFile);
 				return;
